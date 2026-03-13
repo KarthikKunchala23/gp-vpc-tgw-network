@@ -1,8 +1,8 @@
 resource "aws_vpc" "gp-vpc" {
-    for_each = var.vpc_cidr_blocks
-    cidr_block = each.value
+    count = length(var.vpc_cidr_blocks)
+    cidr_block = var.vpc_cidr_blocks[count.index]
     tags = {
-        Name = "gp-vpc-${each.key}"
+        Name = "gp-vpc-${count.index}"
     }
 }
 
@@ -109,8 +109,23 @@ resource "aws_route" "gp-public-rt-internet-route" {
 }
 
 ### Add routes to private route tables to route to transit gateway ######
-resource "aws_route" "gp-private-rt-tgw-route" {
+resource "aws_route" "gp-private-rt-tgw-route-vpc-1" {
   route_table_id = aws_route_table.gp-private-rt.id
-  for_each = var.vpc_cidr_blocks
-  destination_cidr_block = each.value
+  count = length(var.vpc-1-routes)
+  destination_cidr_block = var.vpc-1-routes[count.index]
+  transit_gateway_id = aws_ec2_transit_gateway.gp-tgw.id
+}
+
+resource "aws_route" "gp-private-rt-tgw-route-vpc-2" {
+  route_table_id = aws_route_table.gp-private-rt-vpc-2.id
+  count = length(var.vpc-2-routes)
+  destination_cidr_block = var.vpc-2-routes[count.index]
+  transit_gateway_id = aws_ec2_transit_gateway.gp-tgw.id
+}
+
+resource "aws_route" "gp-private-rt-tgw-route-vpc-3" {
+  route_table_id = aws_route_table.gp-private-rt-vpc-3.id
+  count = length(var.vpc-3-routes)
+  destination_cidr_block = var.vpc-3-routes[count.index]    
+  transit_gateway_id = aws_ec2_transit_gateway.gp-tgw.id
 }
