@@ -273,7 +273,7 @@ GitHub
 https://github.com/KarthikKunchala23
 
 LinkedIn
-https://linkedin.com
+[https://linkedin.com](https://www.linkedin.com/in/karthikkunchala/)
 
 ---
 
