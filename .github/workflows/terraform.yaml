@@ -23,12 +23,6 @@ on:
 
 
 jobs:
-  Checkout:
-    name: Checkout
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
   Terraform:
     name: Terraform
     environment: ${{ github.event.inputs.environment }}
@@ -37,6 +31,9 @@ jobs:
     env:
       TF_WORKSPACE: ${{ github.event.inputs.environment }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
