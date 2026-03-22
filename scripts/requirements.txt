@@ -8,7 +8,6 @@ botocore==1.42.73
 certifi==2020.6.20
 chardet==4.0.0
 click==8.0.3
-cloud-init==25.2
 colorama==0.4.4
 command-not-found==0.3
 configobj==5.0.6
