@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TF_WORKSPACE: ${{ github.event.inputs.environment }}
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -60,15 +60,15 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
-        working-directory: terraform/envs/${{ github.event.inputs.environment }}
+        working-directory: terraform
         run: terraform init -input=false
 
       - name: Terraform Validate
-        working-directory: terraform/envs/${{ github.event.inputs.environment }}
+        working-directory: terraform
         run: terraform validate
 
       - name: Terraform Plan
-        working-directory: terraform/envs/${{ github.event.inputs.environment }}
+        working-directory: terraform
         run: terraform plan -out=tfplan -input=false 
 
       - name: Validate Commit
@@ -79,5 +79,5 @@ jobs:
         
       - name: Terraform Apply
         if: steps.validate.outputs.allow_apply == 'true'
-        working-directory: terraform/envs/${{ github.event.inputs.environment }}
+        working-directory: terraform
         run: terraform apply -input=false -auto-approve tfplan
