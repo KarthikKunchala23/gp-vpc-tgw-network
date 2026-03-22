@@ -3,11 +3,11 @@ name : Terraform Plan and Apply
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - 'terraform/**'
   pull_request:
-    branches:
-      - main
+    paths:
+      - 'terraform/**'
   workflow_dispatch:
 
 jobs:
@@ -51,4 +51,3 @@ jobs:
         if: github.event_name == 'push'
         working-directory: terraform/envs/dev
         run: terraform apply -input=false -auto-approve tfplan
-        
