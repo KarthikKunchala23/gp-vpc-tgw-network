@@ -1,6 +1,7 @@
 ---
 name : Terraform Plan and Apply
 
+
 on:
   push:
     paths:
@@ -9,20 +10,43 @@ on:
     paths:
       - 'terraform/**'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy (dev, staging, prod)"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+            - dev
+            - staging
+            - prod
+
 
 jobs:
-  Checkout:
-    name: Checkout
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
   Terraform:
     name: Terraform
+    environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
-    needs: Checkout
     env:
-      TF_WORKSPACE: "dev"
+      TF_WORKSPACE: ${{ github.event.inputs.environment }}
+
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.12'
+      
+      - name: Debug files
+        run: |
+            pwd
+            ls -R
+
+      - name: Install Python dependencies
+        run: pip install -r scripts/requirements.txt
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -36,18 +60,24 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
-        working-directory: terraform/envs/dev
+        working-directory: terraform
         run: terraform init -input=false
 
       - name: Terraform Validate
-        working-directory: terraform/envs/dev
+        working-directory: terraform
         run: terraform validate
 
       - name: Terraform Plan
-        working-directory: terraform/envs/dev
-        run: terraform plan -out=tfplan -input=false -var="airflow_db_password=${{ secrets.AIRFLOW_DB_PASSWORD }}"
+        working-directory: terraform
+        run: terraform plan -out=tfplan -input=false 
+
+      - name: Validate Commit
+        id: validate
+        run: python3 scripts/validate_commit.py
+        # Check if the commit message contains [skip plan] or [skip apply]
+
         
       - name: Terraform Apply
-        if: github.event_name == 'push'
-        working-directory: terraform/envs/dev
+        if: steps.validate.outputs.allow_apply == 'true'
+        working-directory: terraform
         run: terraform apply -input=false -auto-approve tfplan
