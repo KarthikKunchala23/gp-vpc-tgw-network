@@ -1,7 +1,6 @@
 ---
 name : Terraform Plan and Apply
 
-
 on:
   push:
     paths:
@@ -10,17 +9,6 @@ on:
     paths:
       - 'terraform/**'
   workflow_dispatch:
-    inputs:
-      environment:
-        description: "Environment to deploy (dev, staging, prod)"
-        required: true
-        default: "dev"
-        type: choice
-        options:
-            - dev
-            - staging
-            - prod
-
 
 jobs:
   Checkout:
@@ -28,14 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
   Terraform:
     name: Terraform
-    environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     needs: Checkout
     env:
-      TF_WORKSPACE: ${{ github.event.inputs.environment }}
+      TF_WORKSPACE: "dev"
     steps:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -50,18 +36,18 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Terraform Init
-        working-directory: terraform/envs/${{ github.event.inputs.environment }}
+        working-directory: terraform/envs/dev
         run: terraform init -input=false
 
       - name: Terraform Validate
-        working-directory: terraform/envs/${{ github.event.inputs.environment }}
+        working-directory: terraform/envs/dev
         run: terraform validate
 
       - name: Terraform Plan
-        working-directory: terraform/envs/${{ github.event.inputs.environment }}
-        run: terraform plan -out=tfplan -input=false 
+        working-directory: terraform/envs/dev
+        run: terraform plan -out=tfplan -input=false -var="airflow_db_password=${{ secrets.AIRFLOW_DB_PASSWORD }}"
         
       - name: Terraform Apply
         if: github.event_name == 'push'
-        working-directory: terraform/envs/${{ github.event.inputs.environment }}
+        working-directory: terraform/envs/dev
         run: terraform apply -input=false -auto-approve tfplan
