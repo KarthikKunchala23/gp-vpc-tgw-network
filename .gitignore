@@ -23,3 +23,4 @@
 *.tar.zst
 *.tfstate.*
 *.tfvars.*
+scripts/venv/*

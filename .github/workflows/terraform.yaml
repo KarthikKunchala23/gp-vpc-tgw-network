@@ -60,8 +60,14 @@ jobs:
       - name: Terraform Plan
         working-directory: terraform/envs/${{ github.event.inputs.environment }}
         run: terraform plan -out=tfplan -input=false 
+
+      - name: Validate Commit
+        id: validate
+        run: python3 ../../scripts/validate_commit.py
+        # Check if the commit message contains [skip plan] or [skip apply]
+
         
       - name: Terraform Apply
-        if: github.event_name == 'push'
+        if: steps.validate.outputs.allow_apply == 'true'
         working-directory: terraform/envs/${{ github.event.inputs.environment }}
         run: terraform apply -input=false -auto-approve tfplan
