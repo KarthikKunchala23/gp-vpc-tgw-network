@@ -69,9 +69,11 @@ jobs:
 
       - name: Terraform Plan
         working-directory: terraform
-        run: |
-          terraform plan -out=tfplan -input=false
-          terraform show -json tfplan > plan.json
+        run: terraform plan -out=tfplan -input=false
+      
+      - name: Save Plan Output
+        id: save_plan
+        run: terraform show -json tfplan > plan.json
 
       - name: Analyze Plan
         id: analyze
