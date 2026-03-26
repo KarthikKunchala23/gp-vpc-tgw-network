@@ -69,7 +69,19 @@ jobs:
 
       - name: Terraform Plan
         working-directory: terraform
-        run: terraform plan -out=tfplan -input=false 
+        run: terraform plan -out=tfplan
+
+      - name: Save Plan Output
+        working-directory: terraform
+        id: save_plan
+        run: |
+          terraform show -json tfplan > plan.json
+          echo "PLAN_FILE=plan.json" >> $GITHUB_ENV
+
+      - name: Analyze Plan
+        working-directory: terraform
+        id: analyze
+        run: python3 ../scripts/analyze_plan.py
 
       - name: Validate Commit
         id: validate
