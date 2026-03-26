@@ -76,7 +76,7 @@ jobs:
         id: save_plan
         run: |
           terraform show -json tfplan > plan.json
-          echo "plan_output=$(cat plan.json)" >> $GITHUB_OUTPUT
+          echo "PLAN_FILE=plan.json" >> $GITHUB_ENV
 
       - name: Analyze Plan
         id: analyze
