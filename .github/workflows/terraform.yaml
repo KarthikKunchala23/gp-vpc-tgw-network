@@ -72,11 +72,12 @@ jobs:
         run: terraform plan -out=tfplan
 
       - name: Save Plan Output
+        working-directory: terraform
         id: save_plan
         run: |
           terraform show -json tfplan > plan.json
           echo "plan_output=$(cat plan.json)" >> $GITHUB_OUTPUT
-          
+
       - name: Analyze Plan
         id: analyze
         run: python3 scripts/analyze_plan.py
