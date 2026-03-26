@@ -85,7 +85,7 @@ jobs:
 
       - name: Validate Commit
         id: validate
-        run: python3 ../scripts/validate_commit.py
+        run: python3 scripts/validate_commit.py
         # Check if the commit message contains [skip plan] or [skip apply]
 
         
