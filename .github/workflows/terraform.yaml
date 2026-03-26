@@ -69,7 +69,13 @@ jobs:
 
       - name: Terraform Plan
         working-directory: terraform
-        run: terraform plan -out=tfplan -input=false 
+        run: |
+          terraform plan -out=tfplan -input=false
+          terraform show -json tfplan > plan.json
+
+      - name: Analyze Plan
+        id: analyze
+        run: python3 scripts/analyze_plan.py
 
       - name: Validate Commit
         id: validate

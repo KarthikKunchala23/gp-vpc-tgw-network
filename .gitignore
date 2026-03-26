@@ -24,3 +24,4 @@
 *.tfstate.*
 *.tfvars.*
 scripts/venv/*
+plan.json
