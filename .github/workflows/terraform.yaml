@@ -1,7 +1,6 @@
 ---
 name : Terraform Plan and Apply
 
-
 on:
   push:
     paths:
@@ -10,22 +9,10 @@ on:
     paths:
       - 'terraform/**'
   workflow_dispatch:
-    inputs:
-      environment:
-        description: "Environment to deploy (dev, staging, prod)"
-        required: true
-        default: "dev"
-        type: choice
-        options:
-            - dev
-            - staging
-            - prod
-
 
 jobs:
   Terraform:
     name: Terraform
-    environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     env:
       TF_WORKSPACE: ${{ github.event.inputs.environment }}
