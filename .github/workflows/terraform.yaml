@@ -1,6 +1,5 @@
 ---
-name : Terraform Plan and Apply
-
+name: Terraform Pipeline
 
 on:
   push:
@@ -11,85 +10,25 @@ on:
       - 'terraform/**'
   workflow_dispatch:
     inputs:
+      working_directory:
+        default: terraform
+        type: string
+      aws_region:
+        default: ap-south-1
+        type: string
       environment:
-        description: "Environment to deploy (dev, staging, prod)"
-        required: true
-        default: "dev"
+        default: dev
         type: choice
         options:
-            - dev
-            - staging
-            - prod
-
+          - dev
+          - staging
+          - prod
 
 jobs:
-  Terraform:
-    name: Terraform
-    environment: ${{ github.event.inputs.environment }}
-    runs-on: ubuntu-latest
-    env:
-      TF_WORKSPACE: ${{ github.event.inputs.environment }}
+  terraform:
+    uses: KarthikKunchala23/gp-github-workflows/.github/workflows/terraform.yaml@main
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10.12'
-      
-      - name: Debug files
-        run: |
-            pwd
-            ls -R
-
-      - name: Install Python dependencies
-        run: pip install -r scripts/requirements.txt
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.5.6
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Terraform Init
-        working-directory: terraform
-        run: terraform init -input=false
-
-      - name: Terraform Validate
-        working-directory: terraform
-        run: terraform validate
-
-      - name: Terraform Plan
-        working-directory: terraform
-        run: terraform plan -out=tfplan
-
-      - name: Save Plan Output
-        working-directory: terraform
-        id: save_plan
-        run: |
-          terraform show -json tfplan > plan.json
-          echo "PLAN_FILE=plan.json" >> $GITHUB_ENV
-
-      - name: Analyze Plan
-        working-directory: terraform
-        id: analyze
-        run: python3 ../scripts/analyze_plan.py
-
-      - name: Validate Commit
-        id: validate
-        run: python3 scripts/validate_commit.py
-        # Check if the commit message contains [skip plan] or [skip apply]
-
-        
-      - name: Terraform Apply
-        if: steps.validate.outputs.allow_apply == 'true'
-        working-directory: terraform
-        run: terraform apply -input=false -auto-approve tfplan
+    with:
+      working_directory: ${{ github.event.inputs.working_directory || 'terraform' }}
+      aws_region: ${{ github.event.inputs.aws_region || 'ap-south-1' }}
+      environment: ${{ github.event.inputs.environment || 'dev' }}
