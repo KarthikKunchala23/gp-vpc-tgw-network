@@ -27,6 +27,9 @@ on:
 jobs:
   terraform:
     uses: KarthikKunchala23/gp-github-workflows/.github/workflows/terraform.yaml@main
+    permissions:
+      id-token: write
+      contents: read
 
     with:
       working_directory: ${{ github.event.inputs.working_directory || 'terraform' }}
