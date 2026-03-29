@@ -92,14 +92,20 @@ This Terraform project provisions the following AWS resources:
 ```
 gp-vpc-tgw-network
 │
-├── provider.tf        # AWS provider configuration
-├── variables.tf       # Input variables
-│
-├── vpc.tf             # VPC and subnet creation
-├── tgw.tf             # Transit Gateway configuration
-├── versions.tf          # terraform versions
+├──.github
+│     ├──workflows
+│           ├──terraform.yaml
+├──terraform
+│     ├── provider.tf        # AWS provider configuration
+│     ├── variables.tf       # Input variables
+│     │ 
+│     ├── vpc.tf             # VPC and subnet creation
+│     ├── tgw.tf             # Transit Gateway configuration
+│     ├── versions.tf          # terraform versions
 │
 └── README.md
+└── LICENSE
+└──.gitignore
 ```
 
 ---
